@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Install requirements
+echo "Install requirements"
+pip install -r requirements.txt
+
 # Pre-processing
 echo "Running pre-processing"
 bash scripts/preprocess.sh

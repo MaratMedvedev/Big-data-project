@@ -1,0 +1,19 @@
+{
+  "type" : "record",
+  "name" : "target_price_prediction",
+  "doc" : "Sqoop import of target_price_prediction",
+  "fields" : [ {
+    "name" : "property_id",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "property_id",
+    "sqlType" : "4"
+  }, {
+    "name" : "price_in_lacs",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "price_in_lacs",
+    "sqlType" : "2"
+  } ],
+  "tableName" : "target_price_prediction"
+}

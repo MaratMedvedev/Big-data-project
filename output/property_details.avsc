@@ -1,0 +1,79 @@
+{
+  "type" : "record",
+  "name" : "property_details",
+  "doc" : "Sqoop import of property_details",
+  "fields" : [ {
+    "name" : "id",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "id",
+    "sqlType" : "4"
+  }, {
+    "name" : "posted_by",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "posted_by",
+    "sqlType" : "12"
+  }, {
+    "name" : "under_construction",
+    "type" : [ "null", "boolean" ],
+    "default" : null,
+    "columnName" : "under_construction",
+    "sqlType" : "-7"
+  }, {
+    "name" : "rera",
+    "type" : [ "null", "boolean" ],
+    "default" : null,
+    "columnName" : "rera",
+    "sqlType" : "-7"
+  }, {
+    "name" : "bhk_no",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "bhk_no",
+    "sqlType" : "4"
+  }, {
+    "name" : "bhk_or_rk",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "bhk_or_rk",
+    "sqlType" : "12"
+  }, {
+    "name" : "square_ft",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "square_ft",
+    "sqlType" : "2"
+  }, {
+    "name" : "ready_to_move",
+    "type" : [ "null", "boolean" ],
+    "default" : null,
+    "columnName" : "ready_to_move",
+    "sqlType" : "-7"
+  }, {
+    "name" : "resale",
+    "type" : [ "null", "boolean" ],
+    "default" : null,
+    "columnName" : "resale",
+    "sqlType" : "-7"
+  }, {
+    "name" : "address",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "address",
+    "sqlType" : "12"
+  }, {
+    "name" : "longitude",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "longitude",
+    "sqlType" : "2"
+  }, {
+    "name" : "latitude",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "latitude",
+    "sqlType" : "2"
+  } ],
+  "tableName" : "property_details"
+}
