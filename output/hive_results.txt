@@ -1,0 +1,65 @@
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP DATABASE IF EXISTS team28_projectdb CASCADE;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE DATABASE team28_projectdb LOCATION "project/hive/warehouse";
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> USE team28_projectdb;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Create tables
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- property_details table
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE property_details STORED AS AVRO LOCATION 'project/warehouse/property_details' TBLPROPERTIES ('avro.schema.url'='project/warehouse/avsc/propert y_details.avsc');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- target_price_prediction table
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE target_price_prediction STORED AS AVRO LOCATION 'project/warehouse/target_price_prediction' TBLPROPERTIES ('avro.schema.url'='project/warehous e/avsc/target_price_prediction.avsc');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- change(correct) datatypes
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> --ALTER TABLE target_price_prediction CHANGE price_in_lacs price_in_lacs_float FLOAT;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> --Test database
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DESCRIBE property_details;
++---------------------+------------+----------+
+|      col_name       | data_type  | comment  |
++---------------------+------------+----------+
+| id                  | int        |          |
+| posted_by           | string     |          |
+| under_construction  | boolean    |          |
+| rera                | boolean    |          |
+| bhk_no              | int        |          |
+| bhk_or_rk           | string     |          |
+| square_ft           | string     |          |
+| ready_to_move       | boolean    |          |
+| resale              | boolean    |          |
+| address             | string     |          |
+| longitude           | string     |          |
+| latitude            | string     |          |
++---------------------+------------+----------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT * FROM property_details LIMIT 5;
++----------------------+-----------------------------+--------------------------------------+------------------------+--------------------------+-----------------------------+-----------------------------+---------------------------------+--------------------------+------------------------------------+-----------------------------+----------------------------+
+| property_details.id  | property_details.posted_by  | property_details.under_construction  | property_details.rera  | property_details.bhk_no  | property_details.bhk_or_rk  | property_details.square_ft  | property_details.ready_to_move  | property_details.resale  |      property_details.address      | property_details.longitude  | property_details.latitude  |
++----------------------+-----------------------------+--------------------------------------+------------------------+--------------------------+-----------------------------+-----------------------------+---------------------------------+--------------------------+------------------------------------+-----------------------------+----------------------------+
+| 0                    | Owner                       | false                                | false                  | 2                        | BHK                         | 1300.2364070000             | true                            | true                     | """Ksfc Layout_Bangalore"""        | 2.9699000000                | 77.5979600000              |
+| 1                    | Dealer                      | false                                | false                  | 2                        | BHK                         | 1275.0000000000             | true                            | true                     | """Vishweshwara Nagar_Mysore"""    | 2.2745300000                | 76.6446050000              |
+| 2                    | Owner                       | false                                | false                  | 2                        | BHK                         | 933.1597222000              | true                            | true                     | """Jigani_Bangalore"""             | 2.7780300000                | 77.6321910000              |
+| 3                    | Owner                       | false                                | true                   | 2                        | BHK                         | 929.9211427000              | true                            | true                     | """Sector-1 Vaishali_Ghaziabad"""  | 8.6420000000                | 77.3445000000              |
+| 4                    | Dealer                      | true                                 | false                  | 2                        | BHK                         | 999.0092470000              | false                           | true                     | """New Town_Kolkata"""             | 2.5920000000                | 88.4849110000              |
++----------------------+-----------------------------+--------------------------------------+------------------------+--------------------------+-----------------------------+-----------------------------+---------------------------------+--------------------------+------------------------------------+-----------------------------+----------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DESCRIBE target_price_prediction;
++----------------+------------+----------+
+|    col_name    | data_type  | comment  |
++----------------+------------+----------+
+| property_id    | int        |          |
+| price_in_lacs  | string     |          |
++----------------+------------+----------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT * FROM target_price_prediction LIMIT 5;
++--------------------------------------+----------------------------------------+
+| target_price_prediction.property_id  | target_price_prediction.price_in_lacs  |
++--------------------------------------+----------------------------------------+
+| 0                                    | 55.0                                   |
+| 1                                    | 51.0                                   |
+| 2                                    | 43.0                                   |
+| 3                                    | 62.5                                   |
+| 4                                    | 60.5                                   |
++--------------------------------------+----------------------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 

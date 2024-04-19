@@ -1,0 +1,109 @@
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SET hive.exec.dynamic.partition = true; 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SET hive.exec.dynamic.partition.mode = nonstrict; 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> USE team28_projectdb;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Create new external table partitioned by poster and bucketed by area(also to fix column datatypes)
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> drop table if exists property_details_part_buck;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE property_details_part_buck(
+. . . . . . . . . . . . . . . . . . . . . . .>     id int,
+. . . . . . . . . . . . . . . . . . . . . . .>     under_construction boolean,
+. . . . . . . . . . . . . . . . . . . . . . .>     rera boolean,
+. . . . . . . . . . . . . . . . . . . . . . .>     bhk_no int,
+. . . . . . . . . . . . . . . . . . . . . . .>     bhk_or_rk varchar(50),
+. . . . . . . . . . . . . . . . . . . . . . .>     square_ft decimal(20,10),
+. . . . . . . . . . . . . . . . . . . . . . .>     ready_to_move boolean,
+. . . . . . . . . . . . . . . . . . . . . . .>     resale boolean,
+. . . . . . . . . . . . . . . . . . . . . . .>     address varchar(255),
+. . . . . . . . . . . . . . . . . . . . . . .>     longitude decimal(19,10),
+. . . . . . . . . . . . . . . . . . . . . . .>     latitude decimal(19,10)
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .>     PARTITIONED BY (posted_by varchar(50))
+. . . . . . . . . . . . . . . . . . . . . . .>     CLUSTERED BY (square_ft) into 7 buckets
+. . . . . . . . . . . . . . . . . . . . . . .>     STORED AS AVRO LOCATION 'project/hive/warehouse/property_details_part_buck'
+. . . . . . . . . . . . . . . . . . . . . . .>     TBLPROPERTIES ('AVRO.COMPRESS'='SNAPPY');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Insert data from unpartitioned table
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> INSERT INTO property_details_part_buck
+. . . . . . . . . . . . . . . . . . . . . . .> PARTITION (posted_by)
+. . . . . . . . . . . . . . . . . . . . . . .> SELECT id, under_construction, rera, bhk_no, bhk_or_rk, square_ft, ready_to_move, resale,address, longitude, latitude, posted_by FROM property_details;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Check accessibility
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DESCRIBE property_details_part_buck;
++--------------------------+-----------------+----------+
+|         col_name         |    data_type    | comment  |
++--------------------------+-----------------+----------+
+| id                       | int             |          |
+| under_construction       | boolean         |          |
+| rera                     | boolean         |          |
+| bhk_no                   | int             |          |
+| bhk_or_rk                | varchar(50)     |          |
+| square_ft                | decimal(20,10)  |          |
+| ready_to_move            | boolean         |          |
+| resale                   | boolean         |          |
+| address                  | varchar(255)    |          |
+| longitude                | decimal(19,10)  |          |
+| latitude                 | decimal(19,10)  |          |
+| posted_by                | varchar(50)     |          |
+|                          | NULL            | NULL     |
+| # Partition Information  | NULL            | NULL     |
+| # col_name               | data_type       | comment  |
+| posted_by                | varchar(50)     |          |
++--------------------------+-----------------+----------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT * FROM property_details_part_buck WHERE posted_by="Builder" AND square_ft<300 limit 10;
++--------------------------------+------------------------------------------------+----------------------------------+------------------------------------+---------------------------------------+---------------------------------------+-------------------------------------------+------------------------------------+-------------------------------------+---------------------------------------+--------------------------------------+---------------------------------------+
+| property_details_part_buck.id  | property_details_part_buck.under_construction  | property_details_part_buck.rera  | property_details_part_buck.bhk_no  | property_details_part_buck.bhk_or_rk  | property_details_part_buck.square_ft  | property_details_part_buck.ready_to_move  | property_details_part_buck.resale  | property_details_part_buck.address  | property_details_part_buck.longitude  | property_details_part_buck.latitude  | property_details_part_buck.posted_by  |
++--------------------------------+------------------------------------------------+----------------------------------+------------------------------------+---------------------------------------+---------------------------------------+-------------------------------------------+------------------------------------+-------------------------------------+---------------------------------------+--------------------------------------+---------------------------------------+
+| 29308                          | true                                           | true                             | 1                                  | BHK                                   | 90.2527075800                         | false                                     | false                              | """Roha_Raigad"""                   | 8.4540000000                          | 73.1147000000                        | Builder                               |
+| 20434                          | true                                           | true                             | 1                                  | BHK                                   | 90.2527075800                         | false                                     | false                              | """Roha_Maharashtra"""              | 8.4540000000                          | 73.1147000000                        | Builder                               |
+| 15800                          | true                                           | true                             | 1                                  | BHK                                   | 236.7547279000                        | false                                     | false                              | """Karjat_Maharashtra"""            | 8.5000000000                          | 75.0000000000                        | Builder                               |
+| 24676                          | true                                           | true                             | 1                                  | RK                                    | 237.0546947000                        | false                                     | false                              | """Taloja_Lalitpur"""               | 4.6902800000                          | 78.4188900000                        | Builder                               |
+| 16559                          | false                                          | true                             | 1                                  | RK                                    | 221.6538789000                        | true                                      | false                              | """Nandore_Lalitpur"""              | 4.6902800000                          | 78.4188900000                        | Builder                               |
+| 23661                          | true                                           | true                             | 1                                  | RK                                    | 282.7763496000                        | false                                     | false                              | """Jaitala_Lalitpur"""              | 4.6902800000                          | 78.4188900000                        | Builder                               |
++--------------------------------+------------------------------------------------+----------------------------------+------------------------------------+---------------------------------------+---------------------------------------+-------------------------------------------+------------------------------------+-------------------------------------+---------------------------------------+--------------------------------------+---------------------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Delete old unpartitoned table
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS property_details;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Create new table for target_price_prediction to fix column datatype
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> drop table if exists target_price_prediction_fixed;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> CREATE EXTERNAL TABLE target_price_prediction_fixed(
+. . . . . . . . . . . . . . . . . . . . . . .>    property_id int,
+. . . . . . . . . . . . . . . . . . . . . . .>    price_in_lacs decimal(10,1)
+. . . . . . . . . . . . . . . . . . . . . . .> )
+. . . . . . . . . . . . . . . . . . . . . . .>     CLUSTERED BY (property_id) into 7 buckets
+. . . . . . . . . . . . . . . . . . . . . . .>     STORED AS AVRO LOCATION 'project/hive/warehouse/target_price_prediction_fixed'
+. . . . . . . . . . . . . . . . . . . . . . .>     TBLPROPERTIES ('AVRO.COMPRESS'='SNAPPY');
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Insert data from old table
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> INSERT INTO target_price_prediction_fixed
+. . . . . . . . . . . . . . . . . . . . . . .> SELECT * FROM target_price_prediction;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Check accessibility
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DESCRIBE target_price_prediction_fixed;
++----------------+----------------+----------+
+|    col_name    |   data_type    | comment  |
++----------------+----------------+----------+
+| property_id    | int            |          |
+| price_in_lacs  | decimal(10,1)  |          |
++----------------+----------------+----------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> SELECT * FROM target_price_prediction_fixed WHERE property_id>100 limit 10;
++--------------------------------------------+----------------------------------------------+
+| target_price_prediction_fixed.property_id  | target_price_prediction_fixed.price_in_lacs  |
++--------------------------------------------+----------------------------------------------+
+| 29445                                      | 40.0                                         |
+| 29433                                      | 50.0                                         |
+| 29428                                      | 24.0                                         |
+| 29412                                      | 35.9                                         |
+| 29407                                      | 40.5                                         |
+| 29401                                      | 120.0                                        |
+| 29397                                      | 55.0                                         |
+| 29391                                      | 190.0                                        |
+| 29390                                      | 53.0                                         |
+| 29389                                      | 27.9                                         |
++--------------------------------------------+----------------------------------------------+
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> -- Delete old table
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> DROP TABLE IF EXISTS target_price_prediction;
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
+0: jdbc:hive2://hadoop-03.uni.innopolis.ru:10> 
