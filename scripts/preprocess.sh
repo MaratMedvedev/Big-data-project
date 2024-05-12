@@ -8,5 +8,5 @@ mv train.csv dataset.csv
 mv dataset.csv data
 
 # Dataset preprocessing
-python3 scripts/preprocess_dataset.py
+python3 scripts/preprocess_dataset.py 2> /dev/null
 rm data/dataset.csv
